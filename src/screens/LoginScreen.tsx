@@ -1,58 +1,88 @@
-import React, { useState } from "react";
+import React, { use, useContext, useState } from "react";
 import { View, Text, StyleSheet, ImageBackground, Touchable, TouchableOpacity } from "react-native";
 import { BlurView } from "@react-native-community/blur";
 import CustomInputField from "../components/CustomInputField";
-import CustomButton from "../components/CustomButton";
+import { loginUser } from '../api/userApi'
+import Video from 'react-native-video';
+import {AuthContext} from '../context/AuthContext'
 
-export default function LoginScreen() {
+export default function LoginScreen({navigation}) {
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false)
+
+  const handleCreateUser = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+  
+      const token = await loginUser({ email, password });
+
+      if (token){
+        login(token);
+      }
+  
+      setEmail("");
+      setPassword("");
+    } catch (e) {
+      setError(e.message); 
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <ImageBackground
-      source={require("../assets/imgs/background3.png")}
-      style={styles.background}
-    >
+    <View style={styles.background}>
+     <Video
+        source={{uri:'https://res.cloudinary.com/dhwub37bf/video/upload/hxjs2o3fpvzx4wt6q3fl.mp4'}} 
+        style={StyleSheet.absoluteFill}
+        resizeMode="cover"
+        repeat
+        muted
+        playWhenInactive
+        playInBackground
+        ignoreSilentSwitch="obey"
+      />
       <View style={styles.glassWrapper}>
         <BlurView
           style={StyleSheet.absoluteFill}
-          blurType="ultraThinMaterialDark"
+          blurType='dark'
           blurAmount={10}
           reducedTransparencyFallbackColor="white"
         />
-        <Text style={styles.header}>Hello Again!</Text>
-        <Text style={styles.subHeader}>Welcome back, You’ve been missed!</Text>
+        <Text style={styles.header}>Just write. <Text style={[styles.header, {color: '#2bc466'}]}>Instantly.</Text></Text>
         <CustomInputField
-          placeholder="Enter Username"
+          placeholder="Email"
           value={email}
           boxStyles={{marginBottom: 14}}
           onChangeText={setEmail}
         />
         <CustomInputField
           placeholder="Password"
+          boxStyles={{}}
           value={password}
           onChangeText={setPassword}
         />
-        <Text style={styles.forgot}>Forgot Password?</Text>
-        {/* <CustomButton placeholder="Sign In" onPress={() => {}} /> */}
-        <TouchableOpacity onPress={()=>{}} style={{marginTop: 12}}>
-            <Text style={{fontSize: 18, color: '#fff', fontWeight: 'bold'}}>
-                Sign In
+        <TouchableOpacity disabled={loading} onPress={handleCreateUser} style={{marginTop: 12}}>
+            <Text style={[{fontSize: 22, color: '#2bc466', fontWeight: 'bold', fontFamily: 'Nunito',}, loading && {color: '#aaa'}]}>
+                Login
             </Text>
         </TouchableOpacity>
-       
-
         <Text style={styles.footer}>
-          Don’t have an account? <Text style={styles.register}>Register Now</Text>
+         Do not have an account? <TouchableOpacity onPress={()=>{navigation.replace('Register')}} style={{}}><Text style={styles.register}>Create now</Text></TouchableOpacity>
         </Text>
       </View>
-    </ImageBackground>
+      <Text style={{color: "red", fontSize: 22,fontFamily: 'Nunito', alignSelf: 'center', textAlign: 'center', fontWeight: "700", width: '90%', marginTop: 12}}>{error}</Text>
+      </View>
   );
 }
 
 const styles = StyleSheet.create({
   background: {
     flex: 1,
+    backgroundColor: '#000',
     justifyContent: "center",
     alignItems: "center",
   },
@@ -68,14 +98,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   header: {
-    fontSize: 38,
+    fontSize: 24,
     fontWeight: "900",
-    color: "#fff",
+    textAlign: 'center',
+    fontFamily: 'Nunito',
+    color: "#f7f7f7",
     marginBottom: 8,
   },
   subHeader: {
     fontSize: 16,
     color: "#eee",
+    fontFamily: 'Nunito',
     marginBottom: 20,
     fontWeight: 'bold',
     textAlign: "center",
@@ -93,9 +126,13 @@ const styles = StyleSheet.create({
   footer: {
     marginTop: 20,
     color: "#ccc",
+    fontFamily: 'Nunito',
   },
   register: {
-    color: "#4facfe",
+    color: "#fff",
+    marginBottom: -6,
+    fontSize: 16,
     fontWeight: "600",
+    fontFamily: 'Nunito',
   },
 });

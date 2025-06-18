@@ -12,10 +12,13 @@ import {
 } from "react-native";
 import { BlurView } from "@react-native-community/blur";
 import SaveSvg from '../assets/svg/SaveSvg'
+import { createNote } from "../api/notesApi";
 
-const ModalCreateNote = ({ modalVisible, closeModal }) => {
+const ModalCreateNote = ({ onRefresh, modalVisible, closeModal }) => {
   const scaleAnim = useState(new Animated.Value(0.8))[0];
   const [noteText, setNoteText] = useState("");
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (modalVisible) {
@@ -25,6 +28,22 @@ const ModalCreateNote = ({ modalVisible, closeModal }) => {
       }).start();
     }
   }, [modalVisible]);
+
+  const handleCreateNote = async (content) => {
+    try {
+      setLoading(true);
+      setError(null);
+  
+      await createNote(content);
+      await onRefresh()
+      setNoteText("");
+      closeModal();
+    } catch (e) {
+      setError(e.message); 
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleClose = () => {
     Animated.timing(scaleAnim, {
@@ -47,7 +66,7 @@ const ModalCreateNote = ({ modalVisible, closeModal }) => {
         />
     
         <Pressable style={{ flex: 1 }} onPress={handleClose} />
-
+      
         <Animated.View style={[styles.modalCard, { transform: [{ scale: scaleAnim }] }]}>
           <TextInput
             style={styles.modalTextInput}
@@ -58,8 +77,12 @@ const ModalCreateNote = ({ modalVisible, closeModal }) => {
             placeholderTextColor="#aaa"
           />
         </Animated.View>
-        <TouchableOpacity style={{position: 'absolute', bottom: 50, right: 40}} onPress={closeModal}>
+        {error && <Text style={{position: 'absolute', top: 100, color: "red", fontSize: 22,fontFamily: 'Nunito', alignSelf: 'center', textAlign: 'center', fontWeight: "700", width: '90%', marginTop: 12}}>
+          {error}
+        </Text>}
+        <TouchableOpacity style={{position: 'absolute', bottom: 50, right: 40}} onPress={()=>{handleCreateNote(noteText)}}>
             <Text style={{fontSize: 28,
+            fontFamily: 'Nunito',
     color: "#ddd",}}>Save</Text>
         </TouchableOpacity>
       </View>
@@ -86,6 +109,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: "#fff",
     textAlignVertical: "top",
+    fontFamily: 'Nunito'
   },
 });
 

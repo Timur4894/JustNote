@@ -3,6 +3,9 @@ import { View, Text, StyleSheet, ImageBackground, Touchable, TouchableOpacity } 
 import { BlurView } from "@react-native-community/blur";
 
 const NoteCard = ({ subtitle, color, onPress }) => {
+    const truncatedSubtitle =
+      subtitle.length > 20 ? subtitle.substring(0, 20) + "..." : subtitle;
+
     return(
     <TouchableOpacity style={styles.cardWrapper} onPress={onPress}>
       <BlurView
@@ -11,9 +14,9 @@ const NoteCard = ({ subtitle, color, onPress }) => {
         blurAmount={10}
         reducedTransparencyFallbackColor="white"
       />
-      <View style={{position: 'absolute', right: 10, top: 10, width: 10, height: 10, borderRadius: 99, backgroundColor: color, overflow: 'hidden',     borderColor: "rgba(255, 255, 255, 0.5)",borderWidth: 1,}}/>
+      {/* <View style={{position: 'absolute', right: 10, top: 10, width: 10, height: 10, borderRadius: 99, backgroundColor: color, overflow: 'hidden',     borderColor: "rgba(255, 255, 255, 0.5)",borderWidth: 1,}}/> */}
       <Text style={styles.subtitle}>
-        {subtitle}
+        {truncatedSubtitle}
       </Text>
     </TouchableOpacity>
     )
@@ -36,6 +39,8 @@ const styles = StyleSheet.create({
   cardWrapper: {
     borderRadius: 16,
     padding: 12,
+    height: 100,
+    justifyContent: 'center',
     marginBottom: 16,
     width: "48%",
     overflow: "hidden",
@@ -55,7 +60,8 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 22,
     color: "#ddd",
-    marginTop: 8,
+    fontFamily: 'Nunito',
+    marginTop: 0,
   },
   date: {
     fontSize: 12,
