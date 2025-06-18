@@ -1,9 +1,10 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {API_URL} from '@env'
 
 export const createUser = async ({email, password}) => {
   try {
-    const response = await axios.post("https://notesappbackend-q50f.onrender.com/user/register", {
+    const response = await axios.post(`${API_URL}/user/register`, {
       email,
       password,
     });
@@ -22,7 +23,7 @@ export const createUser = async ({email, password}) => {
 
 export const loginUser = async ({email, password}) => {
   try {
-    const response = await axios.post("https://notesappbackend-q50f.onrender.com/user/login", {
+    const response = await axios.post(`${API_URL}/user/login`, {
       email,
       password,
     });
